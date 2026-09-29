@@ -3,55 +3,142 @@ def exibir_arvore(raiz):
     print("Árvore vazia")
     return
 
-  print(f"RAIZ: {raiz.valor}")
+  linhas, _, _, _ = _montar_arvore(raiz)
 
-  pilha = []
-  filhos = []
+  for linha in linhas:
+    print(linha.rstrip())
 
-  if raiz.esquerda is not None:
-    filhos.append(("E", raiz.esquerda))
 
-  if raiz.direita is not None:
-    filhos.append(("D", raiz.direita))
+def _montar_arvore(no):
+  valor = str(no.valor)
+  largura_valor = len(valor)
 
-  for i in range(len(filhos) - 1, -1, -1):
-    lado, filho = filhos[i]
-    ultimo = i == len(filhos) - 1
-    pilha.append((filho, "", lado, ultimo))
+  # Nó folha
+  if no.esquerda is None and no.direita is None:
+    return [valor], largura_valor, 1, largura_valor // 2
 
-  while pilha:
-    atual, prefixo, lado, ultimo = pilha.pop()
-
-    if ultimo:
-      conector = "└── "
-      novo_prefixo = prefixo + "    "
-    else:
-      conector = "├── "
-      novo_prefixo = prefixo + "│   "
-
-    print(
-      prefixo
-      + conector
-      + lado
-      + ": "
-      + str(atual.valor)
+  # Apenas filho à esquerda
+  if no.direita is None:
+    linhas_esq, largura_esq, altura_esq, meio_esq = (
+      _montar_arvore(no.esquerda)
     )
 
-    filhos = []
+    primeira_linha = (
+      " " * (meio_esq + 1)
+      + "_" * (largura_esq - meio_esq - 1)
+      + valor
+    )
 
-    if atual.esquerda is not None:
-      filhos.append(("E", atual.esquerda))
+    segunda_linha = (
+      " " * meio_esq
+      + "/"
+      + " " * (
+        largura_esq
+        - meio_esq
+        - 1
+        + largura_valor
+      )
+    )
 
-    if atual.direita is not None:
-      filhos.append(("D", atual.direita))
+    linhas_esq = [
+      linha + " " * (largura_valor)
+      for linha in linhas_esq
+    ]
 
-    for i in range(len(filhos) - 1, -1, -1):
-      lado_filho, filho = filhos[i]
-      ultimo_filho = i == len(filhos) - 1
+    return (
+      [primeira_linha, segunda_linha] + linhas_esq,
+      largura_esq + largura_valor,
+      altura_esq + 2,
+      largura_esq + largura_valor // 2
+    )
 
-      pilha.append((
-        filho,
-        novo_prefixo,
-        lado_filho,
-        ultimo_filho
-      ))
+  # Apenas filho à direita
+  if no.esquerda is None:
+    linhas_dir, largura_dir, altura_dir, meio_dir = (
+      _montar_arvore(no.direita)
+    )
+
+    primeira_linha = (
+      valor
+      + "_" * meio_dir
+      + " " * (largura_dir - meio_dir)
+    )
+
+    segunda_linha = (
+      " " * largura_valor
+      + "\\"
+      + " " * (largura_dir - 1)
+    )
+
+    linhas_dir = [
+      " " * largura_valor + linha
+      for linha in linhas_dir
+    ]
+
+    return (
+      [primeira_linha, segunda_linha] + linhas_dir,
+      largura_valor + largura_dir,
+      altura_dir + 2,
+      largura_valor // 2
+    )
+
+  # Dois filhos
+  linhas_esq, largura_esq, altura_esq, meio_esq = (
+    _montar_arvore(no.esquerda)
+  )
+
+  linhas_dir, largura_dir, altura_dir, meio_dir = (
+    _montar_arvore(no.direita)
+  )
+
+  primeira_linha = (
+    " " * (meio_esq + 1)
+    + "_" * (largura_esq - meio_esq - 1)
+    + valor
+    + "_" * meio_dir
+    + " " * (largura_dir - meio_dir)
+  )
+
+  segunda_linha = (
+    " " * meio_esq
+    + "/"
+    + " " * (
+      largura_esq
+      - meio_esq
+      - 1
+      + largura_valor
+      + meio_dir
+    )
+    + "\\"
+    + " " * (largura_dir - meio_dir - 1)
+  )
+
+  # Igualar alturas das duas subárvores
+  if altura_esq < altura_dir:
+    linhas_esq += [
+      " " * largura_esq
+    ] * (altura_dir - altura_esq)
+
+  elif altura_dir < altura_esq:
+    linhas_dir += [
+      " " * largura_dir
+    ] * (altura_esq - altura_dir)
+
+  linhas = []
+
+  for esquerda, direita in zip(
+    linhas_esq,
+    linhas_dir
+  ):
+    linhas.append(
+      esquerda
+      + " " * largura_valor
+      + direita
+    )
+
+  return (
+    [primeira_linha, segunda_linha] + linhas,
+    largura_esq + largura_valor + largura_dir,
+    max(altura_esq, altura_dir) + 2,
+    largura_esq + largura_valor // 2
+  )

@@ -61,19 +61,47 @@ class ArvoreBusca:
 
   # ROTAÇÃO SIMPLES À DIREITA — CASO LL
   def rotacao_direita(self, no):
-    return None
+    if no is None or no.esquerda is None:
+      return no
+    
+    nova_raiz = no.esquerda
+    subarvore = nova_raiz.direita
+    
+    nova_raiz.direita = no
+    no.esquerda = subarvore
+    
+    return nova_raiz
 
   # ROTAÇÃO SIMPLES À ESQUERDA — CASO RR
   def rotacao_esquerda(self, no):
-    return None
+    if no is None or no.direita is None:
+      return no
+    
+    nova_raiz = no.direita
+    subarvore = nova_raiz.esquerda
+    
+    nova_raiz.esquerda = no
+    no.direita = subarvore
+    
+    return nova_raiz
 
   # ROTAÇÃO DUPLA ESQUERDA-DIREITA — CASO LR
   def rotacao_esquerda_direita(self, no):
-    return None
+    if no is None is no.esquerda is None:
+      return no
+    
+    no.esquerda = self.rotacao_esquerda(no.esquerda)
+    
+    return self.rotacao_direita(no)
 
   # ROTAÇÃO DUPLA DIREITA-ESQUERDA — CASO RL
   def rotacao_direita_esquerda(self, no):
-    return None
+    if no is None is no.direita is None:
+      return no
+    
+    no.direita = self.rotacao_direita(no.direita)
+    
+    return self.rotacao_esquerda(no)
 
 
 
